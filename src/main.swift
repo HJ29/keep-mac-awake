@@ -59,30 +59,51 @@ final class Controller: NSObject, NSMenuDelegate {
         return (property?.takeRetainedValue() as? Bool) ?? false
     }
 
-    /// The app icon's gibbous moon as a menu bar template: lit side filled when awake, outline only when not.
-    private static func moonImage(filled: Bool, description: String) -> NSImage {
+    /// The app icon's moon as a menu bar template, alpha carrying its tones: gibbous when awake, a thin crescent when not.
+    private static func moonImage(awake: Bool, description: String) -> NSImage {
+        let craters: [(CGFloat, CGFloat, CGFloat)] = [
+            (-0.35, 0.30, 0.20), (-0.10, -0.40, 0.19), (0.15, 0.48, 0.12), (-0.45, -0.22, 0.13),
+            (-0.80, -0.48, 0.14), (0.75, 0.25, 0.10), (0.68, -0.40, 0.07), (0.50, 0.62, 0.11),
+        ]
+        let litFraction: CGFloat = awake ? 0.78 : 0.22
         let image = NSImage(size: NSSize(width: 18, height: 18), flipped: false) { rect in
-            let r: CGFloat = 7.5, a = r * 0.56
+            let r: CGFloat = 8, a = r * abs(litFraction - 0.5) * 2
             let c = NSPoint(x: rect.midX, y: rect.midY)
-            NSColor.black.set()
-            let outline = NSBezierPath(ovalIn: NSRect(x: c.x - r + 0.75, y: c.y - r + 0.75, width: 2 * r - 1.5, height: 2 * r - 1.5))
-            outline.lineWidth = 1.5
-            outline.stroke()
-            if filled {
-                let lit = NSBezierPath()
-                lit.appendArc(withCenter: c, radius: r, startAngle: 90, endAngle: 270)
-                lit.close()
-                lit.append(NSBezierPath(ovalIn: NSRect(x: c.x - a, y: c.y - r, width: 2 * a, height: 2 * r)))
-                lit.fill()
-            } else {
-                // Terminator: the right half of the lit side's ellipse.
-                NSGraphicsContext.saveGraphicsState()
-                NSBezierPath(rect: NSRect(x: c.x, y: rect.minY, width: rect.width / 2, height: rect.height)).addClip()
-                let terminator = NSBezierPath(ovalIn: NSRect(x: c.x - a, y: c.y - r + 0.75, width: 2 * a, height: 2 * r - 1.5))
-                terminator.lineWidth = 1.5
-                terminator.stroke()
-                NSGraphicsContext.restoreGraphicsState()
+            let moon = NSBezierPath(ovalIn: NSRect(x: c.x - r, y: c.y - r, width: 2 * r, height: 2 * r))
+            let ellipse = NSBezierPath(ovalIn: NSRect(x: c.x - a, y: c.y - r, width: 2 * a, height: 2 * r))
+            let leftHalf = NSBezierPath(rect: NSRect(x: rect.minX, y: rect.minY, width: c.x - rect.minX, height: rect.height))
+            // Fills the clipped area with a surface alpha, then the craters; .copy replaces alpha instead of stacking.
+            func paint(_ surface: CGFloat, _ crater: CGFloat) {
+                NSGraphicsContext.current?.compositingOperation = .copy
+                NSColor(white: 0, alpha: surface).setFill()
+                rect.fill(using: .copy)
+                NSColor(white: 0, alpha: crater).setFill()
+                for (x, y, cr) in craters {
+                    NSBezierPath(ovalIn: NSRect(x: c.x + (x - cr) * r, y: c.y + (y - cr) * r, width: 2 * cr * r, height: 2 * cr * r)).fill()
+                }
             }
+            NSGraphicsContext.saveGraphicsState()
+            moon.addClip()
+            paint(0.30, 0.18)
+            NSGraphicsContext.restoreGraphicsState()
+
+            // Lit side: the left half plus the ellipse (gibbous) or minus it (crescent).
+            NSGraphicsContext.saveGraphicsState()
+            moon.addClip()
+            if litFraction >= 0.5 {
+                let lit = NSBezierPath()
+                lit.append(leftHalf)
+                lit.append(ellipse)
+                lit.addClip()
+            } else {
+                leftHalf.addClip()
+                let lit = NSBezierPath(rect: rect)
+                lit.append(ellipse)
+                lit.windingRule = .evenOdd
+                lit.addClip()
+            }
+            paint(1.0, 0.55)
+            NSGraphicsContext.restoreGraphicsState()
             return true
         }
         image.isTemplate = true
@@ -90,8 +111,8 @@ final class Controller: NSObject, NSMenuDelegate {
         return image
     }
 
-    private static let awakeImage = moonImage(filled: true, description: "Mac awake")
-    private static let normalImage = moonImage(filled: false, description: "Normal sleep")
+    private static let awakeImage = moonImage(awake: true, description: "Mac awake")
+    private static let normalImage = moonImage(awake: false, description: "Normal sleep")
 
     private func refresh() {
         let on = sleepDisabled
