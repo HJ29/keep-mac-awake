@@ -7,7 +7,7 @@ A tiny macOS menu bar app that keeps your Mac running with the lid closed.<br>
 Builds, downloads and AI coding agents keep going while the laptop is shut.
 </p>
 
-<p align="center"><img src="docs/menu.png" width="300" alt="The menu: Keep Mac Awake (checked), Keep Screen Awake, Quit Keep Mac Awake"></p>
+<p align="center"><img src="docs/menu.png" width="300" alt="The menu: Keep Mac Awake (checked), Keep Screen Awake, Quit"></p>
 
 ## What it does
 

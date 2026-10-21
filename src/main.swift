@@ -26,7 +26,7 @@ final class Controller: NSObject, NSMenuDelegate {
         menu.addItem(displayItem)
 
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Quit Keep Mac Awake",
+        menu.addItem(NSMenuItem(title: "Quit",
                                 action: #selector(NSApplication.terminate(_:)),
                                 keyEquivalent: "q"))
 
