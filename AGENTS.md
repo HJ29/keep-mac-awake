@@ -13,7 +13,7 @@ A macOS menu bar app in one Swift file with two toggles: **Keep Mac Awake** (`pm
 4. Never ask for the user's password in chat, and never pipe a password into `sudo`.
 5. Exit code 2 means the dialog was cancelled or couldn't open (for example over SSH). Show the user the `sudo ...` command the script printed, ask them to run it in their own terminal, then run `./install.sh` again.
 6. Verify with `./install.sh --check`: all three lines must start with `ok`.
-7. Tell the user where to find it: the cup icon in the menu bar. **Keep Mac Awake** keeps the Mac running with the lid closed. **Keep Screen Awake** keeps the screen on, which also stops auto-lock. To start it at login, they can add it under System Settings → General → Login Items.
+7. Tell the user where to find it: the moon icon in the menu bar. **Keep Mac Awake** keeps the Mac running with the lid closed. **Keep Screen Awake** keeps the screen on, which also stops auto-lock. To start it at login, they can add it under System Settings → General → Login Items.
 
 To update: `git pull && ./install.sh`. To remove: `./uninstall.sh`, which also shows one password dialog.
 

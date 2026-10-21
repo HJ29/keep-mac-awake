@@ -52,4 +52,4 @@ else
 fi
 
 open "$APP"
-echo "Done. Look for the cup icon in the menu bar."
+echo "Done. Look for the moon icon in the menu bar."
