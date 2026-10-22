@@ -132,7 +132,7 @@ final class Controller: NSObject, NSMenuDelegate {
         let result = run("/usr/bin/sudo", ["-n", "/usr/bin/pmset", "-a", "disablesleep", target])
         if result.code != 0 {
             showFailure("Couldn't change the sleep setting", """
-                `sudo -n` was refused, so the sudoers rule is missing or no longer matches. Run ./install.sh again.
+                `sudo -n` was refused, so the sudoers rule is missing or no longer matches. Run the installer again.
 
                 \(result.output.trimmingCharacters(in: .whitespacesAndNewlines))
                 """)

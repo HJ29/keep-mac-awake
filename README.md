@@ -22,7 +22,13 @@ A menu bar shortcut for two built-in macOS commands, so you don't have to rememb
 
 ## Install
 
-Needs macOS 14 or later, an admin account, and Apple's free Xcode Command Line Tools (`xcode-select --install`). It builds on your Mac from this source code.
+Needs macOS 14 or later and an admin account. Paste this into Terminal:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/HJ29/keep-mac-awake/main/install.sh | bash
+```
+
+It downloads the latest [release](https://github.com/HJ29/keep-mac-awake/releases) into `~/Applications` and starts it. macOS asks for your password once. `pmset` needs root, so the installer adds a sudoers rule that allows only `pmset -a disablesleep 1` and `0`, nothing else.
 
 **With an AI agent** (Claude Code, Codex, opencode, …), paste:
 
@@ -30,7 +36,7 @@ Needs macOS 14 or later, an admin account, and Apple's free Xcode Command Line T
 Install https://github.com/HJ29/keep-mac-awake for me by following its AGENTS.md.
 ```
 
-**Or yourself:**
+**From source:** releases are built by [GitHub Actions](.github/workflows/release.yml) from this code, and `gh attestation verify KeepMacAwake.zip -R HJ29/keep-mac-awake` proves it. To build it yourself instead, install the Xcode Command Line Tools (`xcode-select --install`), then:
 
 ```bash
 git clone https://github.com/HJ29/keep-mac-awake.git
@@ -38,9 +44,11 @@ cd keep-mac-awake
 ./install.sh
 ```
 
-macOS asks for your password once. `pmset` needs root, so the installer adds a sudoers rule that allows only `pmset -a disablesleep 1` and `0`, nothing else.
+To update, run the install again. To start it at login, add KeepMacAwake under System Settings → General → Login Items. To remove it:
 
-To start it at login, add KeepMacAwake under System Settings → General → Login Items. To remove it, run `./uninstall.sh`.
+```bash
+curl -fsSL https://raw.githubusercontent.com/HJ29/keep-mac-awake/main/uninstall.sh | bash
+```
 
 ## Good to know
 

@@ -1,0 +1,41 @@
+# A v* tag publishes KeepMacAwake.zip as a GitHub release; a manual run only builds it as an artifact.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build universal app
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then export VERSION="${GITHUB_REF_NAME#v}"; fi
+          ARCHS="arm64 x86_64" scripts/build.sh "$RUNNER_TEMP/KeepMacAwake.app"
+          lipo -archs "$RUNNER_TEMP/KeepMacAwake.app/Contents/MacOS/KeepMacAwake"
+          ditto -c -k --keepParent "$RUNNER_TEMP/KeepMacAwake.app" KeepMacAwake.zip
+
+      - uses: actions/upload-artifact@v7
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          name: KeepMacAwake
+          path: KeepMacAwake.zip
+
+      - uses: actions/attest-build-provenance@v4
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          subject-path: KeepMacAwake.zip
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" KeepMacAwake.zip --title "$GITHUB_REF_NAME" --generate-notes
